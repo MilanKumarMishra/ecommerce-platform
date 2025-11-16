@@ -9,6 +9,13 @@ dotenv.config();
 
 const app = express();
 app.use(cors({
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 71623bf (Fix CORS: Allow Vercel frontend)
+>>>>>>> e6c4c0e (Fix: Add proper /api/login POST route)
   origin: (origin, callback) => {
     const allowed = [
       'http://localhost:3000',
@@ -20,8 +27,23 @@ app.use(cors({
       callback(new Error('Not allowed by CORS'));
     }
   },
+<<<<<<< HEAD
   credentials: true
 }));
+<<<<<<< HEAD
+=======
+=======
+  origin: [
+    'http://localhost:3000',
+    'https://ecommerce-platform-lime.vercel.app'
+  ],
+=======
+>>>>>>> 71623bf (Fix CORS: Allow Vercel frontend)
+  credentials: true
+}));
+app.use(express.json());
+>>>>>>> 3047d30 (Fix CORS: Allow Vercel frontend)
+>>>>>>> e6c4c0e (Fix: Add proper /api/login POST route)
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
