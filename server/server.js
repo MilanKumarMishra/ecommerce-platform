@@ -150,5 +150,22 @@ app.get('/api/orders/:userId', authMiddleware, async (req, res) => {
   res.json(orders);
 });
 
+// === ROOT / HEALTH CHECK ===
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'ShopHub Backend API is LIVE!', 
+    version: '1.0.0',
+    endpoints: {
+      products: '/api/products',
+      login: '/api/login',
+      register: '/api/register'
+    }
+  });
+});
+
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'OK', time: new Date().toISOString() });
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
