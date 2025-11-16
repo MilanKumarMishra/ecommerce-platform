@@ -1,22 +1,29 @@
+// client/src/components/Register.js
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../redux/authSlice';  // FIXED
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { FaUser, FaLock, FaEnvelope } from 'react-icons/fa';
+import { jwtDecode } from 'jwt-decode';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     axios.post(`${API_BASE_URL}/api/register`, { email, password })
-      .then(() => {
-        toast.success('Account created! Please login.');
-        navigate('/login');
+      .then(res => {
+        localStorage.setItem('token', res.data.token);
+        const decoded = jwtDecode(res.data.token);
+        dispatch(setUser({ id: decoded.id, email: decoded.email, isAdmin: decoded.isAdmin }));
+        toast.success('Account created!');
+        navigate('/');
       })
       .catch(err => toast.error(err.response?.data?.error || 'Registration failed'));
   };
@@ -24,44 +31,29 @@ function Register() {
   return (
     <div className="container mt-5">
       <div className="row justify-content-center">
-        <div className="col-md-6 col-lg-5">
-          <div className="card border-0 shadow-lg" style={{ borderRadius: '20px' }}>
+        <div className="col-md-6">
+          <div className="card">
             <div className="card-body p-5">
-              <h2 className="text-center mb-4 fw-bold text-primary">Create Account</h2>
+              <h2 className="text-center mb-4">Register</h2>
               <form onSubmit={handleSubmit}>
-                <div className="mb-4">
-                  <label className="form-label fw-medium">
-                    <FaEnvelope className="me-2 text-primary" /> Email
-                  </label>
-                  <input
-                    type="email"
-                    className="form-control form-control-lg"
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="form-label fw-medium">
-                    <FaLock className="me-2 text-primary" /> Password
-                  </label>
-                  <input
-                    type="password"
-                    className="form-control form-control-lg"
-                    placeholder="Choose a strong password"
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-                <button type="submit" className="btn btn-primary w-100 btn-lg mt-3">
-                  Sign Up
-                </button>
+                <input
+                  type="email"
+                  placeholder="Email"
+                  className="form-control mb-3"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  required
+                />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  className="form-control mb-3"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  required
+                />
+                <button type="submit" className="btn btn-success w-100">Register</button>
               </form>
-              <p className="text-center mt-4 text-muted">
-                Already have an account? <a href="/login" className="text-primary fw-medium">Login</a>
-              </p>
             </div>
           </div>
         </div>
