@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
-import { setUser } from '../redux/authSlice';  // <-- CORRECT
+import { setUser } from '../redux/authSlice';  // Fixed: Import from authSlice
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { jwtDecode } from 'jwt-decode';
@@ -22,10 +22,10 @@ function Login() {
       .then(res => {
         localStorage.setItem('token', res.data.token);
         const decoded = jwtDecode(res.data.token);
-        dispatch(setUser({
-          id: decoded.id,
-          email: decoded.email,
-          isAdmin: decoded.isAdmin
+        dispatch(setUser({ 
+          id: decoded.id, 
+          email: decoded.email, 
+          isAdmin: decoded.isAdmin 
         }));
         toast.success('Welcome back!');
         navigate('/');
