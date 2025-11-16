@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
-import { setUser } from '../redux/authSlice';  // Fixed: Import from authSlice
+import { setUser } from '../redux/authSlice';  // Fixed: From authSlice
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { jwtDecode } from 'jwt-decode';

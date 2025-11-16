@@ -1,6 +1,7 @@
+// client/src/components/ProductCard.js
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { addToCart } from '../redux/cartSlice';
+import { addItem } from '../redux/cartSlice';  // Fixed: addItem from cartSlice
 import { toast } from 'react-toastify';
 import { FaShoppingCart } from 'react-icons/fa';
 
@@ -8,7 +9,7 @@ function ProductCard({ product }) {
   const dispatch = useDispatch();
 
   const handleAdd = () => {
-    dispatch(addToCart({
+    dispatch(addItem({
       id: product._id,
       name: product.name,
       price: product.price,
@@ -21,7 +22,7 @@ function ProductCard({ product }) {
 
   return (
     <div className="card h-100">
-      <img src={product.image || 'https://via.placeholder.com/300x200?text=No+Image'} alt={product.name} className="card-img-top" style={{ height: '220px', objectFit: 'cover' }} />
+      <img src={product.image || 'https://placehold.co/300x200/6c5ce7/ffffff?text=No+Image'} alt={product.name} className="card-img-top" style={{ height: '220px', objectFit: 'cover' }} />
       <div className="card-body d-flex flex-column">
         <h5 className="card-title fw-bold">{product.name}</h5>
         <p className="card-text text-muted flex-grow-1">{product.description}</p>
