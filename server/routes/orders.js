@@ -2,26 +2,12 @@
 const express = require('express');
 const router = express.Router();
 const Order = require('../models/Order');
-const jwt = require('jsonwebtoken');
+const authMiddleware = require('../middleware/auth');
 
-// Middleware to verify token
-const verifyToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) return res.status(401).json({ error: 'No token' });
-
+// GET orders for user
+router.get('/:userId', authMiddleware, async (req, res) => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch (err) {
-    res.status(401).json({ error: 'Invalid token' });
-  }
-};
-
-// GET user's orders
-router.get('/', verifyToken, async (req, res) => {
-  try {
-    const orders = await Order.find({ userId: req.user.id }).sort({ createdAt: -1 });
+    const orders = await Order.find({ userId: req.params.userId, status: 'completed' });
     res.json(orders);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -29,15 +15,15 @@ router.get('/', verifyToken, async (req, res) => {
 });
 
 // POST new order
-router.post('/', verifyToken, async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
   try {
-    const order = new Order({
-      userId: req.user.id,
-      items: req.body.items,
-      total: req.body.total,
-      delivery: req.body.delivery
-    });
+    const { userId, items, total, delivery } = req.body;
+    const order = new Order({ userId, items, total, delivery, status: 'completed' });
     await order.save();
+
+    // Clear pending cart
+    await Order.deleteOne({ userId, status: 'pending' });
+
     res.json(order);
   } catch (err) {
     res.status(500).json({ error: err.message });
