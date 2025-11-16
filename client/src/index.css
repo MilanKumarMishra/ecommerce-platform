@@ -1,0 +1,208 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* === LIGHT MODE === */
+:root {
+  --bg: #f8f9fa;
+  --text: #212529;
+  --text-light: #f8f9fa;
+  --text-muted: #6c757d;
+  --link-color: #495057;
+  --card-bg: #ffffff;
+  --border: #dee2e6;
+  --primary: #6c5ce7;
+  --success: #28a745;
+  --danger: #dc3545;
+  --shadow: rgba(0,0,0,0.1);
+  --navbar-bg: #ffffff;
+  --hero-bg: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+}
+
+/* === DARK MODE === */
+[data-theme="dark"] {
+  --bg: #121212;
+  --text: #e9ecef;
+  --text-light: #212529;
+  --text-muted: #adb5bd;
+  --link-color: #dee2e6;
+  --card-bg: #1e1e1e;
+  --border: #343a40;
+  --primary: #a29bfe;
+  --success: #28a745;
+  --danger: #ff5252;
+  --shadow: rgba(0,0,0,0.3);
+  --navbar-bg: #1e1e1e;
+  --hero-bg: linear-gradient(135deg, #4a3ab7 0%, #7c6bef 100%);
+}
+
+/* === GLOBAL === */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
+}
+
+a, .nav-link {
+  color: var(--link-color) !important;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover, .nav-link:hover {
+  color: var(--primary) !important;
+}
+
+.container {
+  max-width: 1400px;
+  padding: 0 15px;
+  margin: 0 auto;
+}
+
+/* === CARD === */
+.card {
+  background: var(--card-bg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 16px !important;
+  overflow: hidden;
+  box-shadow: 0 6px 20px var(--shadow) !important;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px var(--shadow) !important;
+}
+
+.card-body {
+  color: var(--text) !important;
+}
+
+/* === TEXT === */
+.text-primary { color: var(--primary) !important; }
+.text-success { color: var(--success) !important; }
+.text-danger { color: var(--danger) !important; }
+.text-muted { color: var(--text-muted) !important; }
+.bg-light { background: var(--card-bg) !important; }
+
+/* === NAVBAR === */
+.navbar {
+  background: var(--navbar-bg) !important;
+  box-shadow: 0 4px 20px var(--shadow);
+  transition: background 0.3s ease;
+}
+
+.navbar-brand {
+  color: var(--primary) !important;
+}
+
+/* === HERO === */
+.hero {
+  background: var(--hero-bg);
+  color: var(--text-light);
+  padding: 70px 20px;
+  text-align: center;
+  border-radius: 0 0 40px 40px;
+  margin-bottom: 40px;
+  transition: background 0.3s ease;
+}
+
+/* === FORM INPUTS === */
+.form-control, .form-select {
+  background: var(--card-bg) !important;
+  border: 2px solid var(--border) !important;
+  color: var(--text) !important;
+  border-radius: 12px !important;
+  padding: 12px 16px !important;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 0.2rem rgba(108, 92, 231, 0.25) !important;
+  background: var(--card-bg) !important;
+  color: var(--text) !important;
+}
+
+/* === BUTTONS === */
+.btn-primary {
+  background: var(--primary) !important;
+  border: none !important;
+  border-radius: 50px !important;
+  padding: 10px 24px !important;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: #5a4fcf !important;
+  transform: translateY(-2px);
+}
+
+.btn-success {
+  border-radius: 50px !important;
+  padding: 12px 30px !important;
+  font-weight: 600;
+}
+
+/* === DARK MODE TOGGLE === */
+.theme-toggle {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  color: var(--text);
+}
+
+.theme-toggle:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .hero {
+    padding: 50px 15px;
+    border-radius: 0 0 30px 30px;
+  }
+  .hero h1 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero h1 {
+    font-size: 1.8rem;
+  }
+  .hero .lead {
+    font-size: 1rem;
+  }
+}
+
+/* === ANIMATED SKELETON === */
+.skeleton {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 8px;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-image { height: 100%; }
+.skeleton-title { height: 20px; width: 70%; }
+.skeleton-text { height: 16px; width: 100%; margin-bottom: 8px; }
+.skeleton-text.short { width: 60%; }
+.skeleton-price { height: 32px; width: 60px; }
+.skeleton-button { height: 40px; width: 120px; }
+.skeleton-input { height: 48px; border-radius: 12px; }
