@@ -8,8 +8,13 @@ const bcrypt = require('bcryptjs');
 dotenv.config();
 
 const app = express();
-app.use(cors({ origin: 'http://localhost:3000' }));
-app.use(express.json());
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'https://ecommerce-platform-lime.vercel.app'
+  ],
+  credentials: true
+}));
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
