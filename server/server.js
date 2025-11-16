@@ -9,10 +9,17 @@ dotenv.config();
 
 const app = express();
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'https://ecommerce-platform-lime.vercel.app'
-  ],
+  origin: (origin, callback) => {
+    const allowed = [
+      'http://localhost:3000',
+      'https://ecommerce-platform-lime.vercel.app'
+    ];
+    if (!origin || allowed.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 
