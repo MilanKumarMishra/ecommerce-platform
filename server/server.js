@@ -8,42 +8,31 @@ const bcrypt = require('bcryptjs');
 dotenv.config();
 
 const app = express();
+
+// CORS: Allow Vercel + localhost
 app.use(cors({
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 71623bf (Fix CORS: Allow Vercel frontend)
->>>>>>> e6c4c0e (Fix: Add proper /api/login POST route)
-  origin: (origin, callback) => {
-    const allowed = [
-      'http://localhost:3000',
-      'https://ecommerce-platform-lime.vercel.app'
-    ];
-    if (!origin || allowed.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-<<<<<<< HEAD
-  credentials: true
-}));
-<<<<<<< HEAD
-=======
-=======
   origin: [
     'http://localhost:3000',
     'https://ecommerce-platform-lime.vercel.app'
   ],
-=======
->>>>>>> 71623bf (Fix CORS: Allow Vercel frontend)
   credentials: true
 }));
+
 app.use(express.json());
->>>>>>> 3047d30 (Fix CORS: Allow Vercel frontend)
->>>>>>> e6c4c0e (Fix: Add proper /api/login POST route)
+
+// Routes
+const authRoutes = require('./routes/auth');
+const productRoutes = require('./routes/products');
+const orderRoutes = require('./routes/orders');
+
+app.use('/api', authRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/orders', orderRoutes);
+
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({ message: 'ShopHub Backend API is LIVE!' });
+});
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
