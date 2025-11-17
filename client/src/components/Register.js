@@ -1,31 +1,32 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useDispatch } from 'react-redux';
-import { setUser } from '../redux/authSlice';  // FIXED
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { jwtDecode } from 'jwt-decode';
-import { FaEnvelope, FaLock } from 'react-icons/fa';
+import { FaUser, FaLock, FaEnvelope } from 'react-icons/fa';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     axios.post(`${API_BASE_URL}/api/register`, { email, password })
       .then(res => {
-        localStorage.setItem('token', res.data.token);
-        const decoded = jwtDecode(res.data.token);
-        dispatch(setUser({ id: decoded.id, email: decoded.email, isAdmin: decoded.isAdmin }));
-        toast.success('Registered! Please login.');
-        navigate('/login');
+        if (res.status === 200) { // Check status for success
+          toast.success('Registered successfully! Please login.');
+          navigate('/login');
+        }
       })
-      .catch(err => toast.error(err.response?.data?.error || 'Registration failed'));
+      .catch(err => {
+        if (err.response?.status === 400) {
+          toast.error('User already exists');
+        } else {
+          toast.error(err.response?.data?.error || 'Registration failed');
+        }
+      });
   };
 
   return (
@@ -34,7 +35,7 @@ function Register() {
         <div className="col-md-6 col-lg-5">
           <div className="card border-0 shadow-lg" style={{ borderRadius: '20px' }}>
             <div className="card-body p-5">
-              <h2 className="text-center mb-4 fw-bold text-primary">Register</h2>
+              <h2 className="text-center mb-4 fw-bold text-primary">Create Account</h2>
               <form onSubmit={handleSubmit}>
                 <div className="mb-4">
                   <label className="form-label fw-medium">
@@ -56,14 +57,14 @@ function Register() {
                   <input
                     type="password"
                     className="form-control form-control-lg"
-                    placeholder="••••••••"
+                    placeholder="Choose a strong password"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     required
                   />
                 </div>
                 <button type="submit" className="btn btn-primary w-100 btn-lg mt-3">
-                  Register
+                  Sign Up
                 </button>
               </form>
               <p className="text-center mt-4 text-muted">

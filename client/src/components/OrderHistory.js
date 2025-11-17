@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 function OrderHistory() {
-  const user = useSelector(state => state.auth.user);
+  const user = useSelector(state => state.cart.user);
   const token = localStorage.getItem('token');
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,13 +17,10 @@ function OrderHistory() {
         headers: { Authorization: `Bearer ${token}` }
       })
         .then(res => {
-          setOrders(res.data);
-          setLoading(false);
+          setOrders(res.data); // Fetch all completed orders
         })
-        .catch(err => {
-          toast.error('Failed to load orders');
-          setLoading(false);
-        });
+        .catch(err => toast.error('Failed to load orders'))
+        .finally(() => setLoading(false));
     } else {
       toast.error('Please login to view orders');
       setLoading(false);
@@ -34,7 +31,7 @@ function OrderHistory() {
 
   return (
     <div className="container mt-4">
-      <h2 className="mb-4">Order History</h2>
+      <h2>Order History</h2>
       {orders.length === 0 ? (
         <p>No orders yet.</p>
       ) : (

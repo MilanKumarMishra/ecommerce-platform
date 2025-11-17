@@ -1,4 +1,3 @@
-// client/src/redux/cartSlice.js
 import { createSlice } from '@reduxjs/toolkit';
 
 const cartSlice = createSlice({
@@ -15,41 +14,28 @@ const cartSlice = createSlice({
       const item = action.payload;
       const existing = state.items.find(i => i.id === item.id);
       if (existing) {
-        existing.quantity += 1;
+        existing.quantity += action.payload.quantity || 1;
       } else {
-        state.items.push({ ...item, quantity: 1 });
+        state.items.push({ ...item, quantity: action.payload.quantity || 1 });
       }
     },
     removeFromCart: (state, action) => {
-      state.items = state.items.filter(item => item.id !== action.payload);
+      state.items = state.items.filter(i => i.id !== action.payload);
     },
     updateCartItemQuantity: (state, action) => {
-      const { id, quantity } = action.payload;
-      const item = state.items.find(i => i.id === id);
+      const item = state.items.find(i => i.id === action.payload.id);
       if (item) {
-        item.quantity = quantity;
-        if (quantity <= 0) {
-          state.items = state.items.filter(i => i.id !== id);
-        }
+        item.quantity = action.payload.quantity;
       }
+    },
+    loadCart: (state, action) => {
+      state.items = action.payload;
     },
     clearCart: (state) => {
       state.items = [];
     },
-    loadCart: (state, action) => {
-      state.items = action.payload;
-    }
-  }
+  },
 });
 
-// Export ALL actions
-export const {
-  setUser,
-  addToCart,
-  removeFromCart,
-  updateCartItemQuantity,   // ← THIS WAS MISSING
-  clearCart,
-  loadCart
-} = cartSlice.actions;
-
+export const { setUser, addToCart, removeFromCart, updateCartItemQuantity, loadCart, clearCart } = cartSlice.actions;
 export default cartSlice.reducer;
