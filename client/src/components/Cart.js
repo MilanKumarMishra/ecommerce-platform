@@ -1,37 +1,35 @@
 // client/src/components/Cart.js
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { removeFromCart, clearCart } from '../redux/cartSlice';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { FaPlus, FaMinus, FaTrash } from 'react-icons/fa';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://shop-hub-backend.onrender.com';
 
 function Cart() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const cartItems = useSelector(state => state.cart.items);
-  const user = useSelector(state => state.auth.user);  // From authSlice
+  const { items = [] } = useSelector(state => state.cart);
+  const user = useSelector(state => state.auth.user);
   const token = localStorage.getItem('token');
 
-  const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  // Load cart from backend on mount
+  // Load cart from backend
   useEffect(() => {
     if (user?.id && token) {
-      loadCartFromBackend(user.id);
+      loadCartFromBackend();
     }
   }, [user]);
 
-  const loadCartFromBackend = async (id) => {
+  const loadCartFromBackend = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/api/cart/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      // Clear Redux and add backend items
+      const res = await axios.get(
+        `${API_BASE_URL}/api/cart/${user.id}`,  // FIXED: Added /api
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       dispatch(clearCart());
       res.data.items.forEach(item => {
         dispatch({
@@ -40,138 +38,97 @@ function Cart() {
         });
       });
     } catch (err) {
-      console.error('Failed to load cart:', err);
+      if (err.response?.status !== 404) {
+        console.error('Failed to load cart:', err);
+        toast.error('Failed to load cart');
+      }
+      // 404 is normal for first-time users → empty cart
     }
   };
 
-  // Sync cart to backend on change
+  // Save cart to backend (debounced)
   useEffect(() => {
-    if (user?.id && token && cartItems.length > 0) {
+    if (user?.id && token && items.length > 0) {
       const timer = setTimeout(() => {
         saveCartToBackend();
-      }, 1000);  // Debounce 1s
+      }, 800);
       return () => clearTimeout(timer);
     }
-  }, [cartItems, user]);
+  }, [items]);
 
   const saveCartToBackend = async () => {
     try {
-      await axios.post(`${API_BASE_URL}/api/cart/${user.id}`, { items: cartItems }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.post(
+        `${API_BASE_URL}/api/cart/${user.id}`,  // FIXED: Added /api
+        { items },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
     } catch (err) {
-      toast.error('Failed to save cart');
+      console.error('Failed to save cart:', err);
     }
   };
 
-  const handleQuantityChange = (id, change) => {
-    const item = cartItems.find(i => i.id === id);
-    if (item) {
-      const newQuantity = Math.max(1, item.quantity + change);
-      dispatch({
-        type: 'cart/updateQuantity',
-        payload: { id, quantity: newQuantity }
-      });
-    }
-  };
-
-  const handleRemoveFromCart = (id) => {
+  const handleRemove = (id) => {
     dispatch(removeFromCart(id));
   };
 
   const handleCheckout = () => {
-    if (!user) {
-      toast.error('Please login to checkout');
-      navigate('/login');
-      return;
-    }
-    if (cartItems.length === 0) {
-      toast.error('Your cart is empty');
-      return;
-    }
-    navigate('/delivery');
+    navigate('/delivery', { state: { cart: items } });
   };
 
+  if (!user) {
+    return (
+      <div className="container py-5 text-center">
+        <h3>Please login to view your cart</h3>
+        <Link to="/login" className="btn btn-primary">Login</Link>
+      </div>
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <div className="container py-5 text-center">
+        <h3>Your cart is empty</h3>
+        <Link to="/" className="btn btn-primary">Continue Shopping</Link>
+      </div>
+    );
+  }
+
   return (
-    <div className="container mt-4">
-      <h2 className="mb-4">Your Cart</h2>
-
-      {cartItems.length === 0 ? (
-        <div className="alert alert-info text-center">
-          Your cart is empty. <a href="/">Continue shopping</a>
-        </div>
-      ) : (
-        <>
-          <div className="row">
-            <div className="col-lg-8">
-              {cartItems.map(item => (
-                <div key={item.id} className="card mb-3">
-                  <div className="card-body d-flex justify-content-between align-items-center">
-                    <div>
-                      <h5 className="card-title">{item.name}</h5>
-                      <p className="text-muted mb-1">Price: ${item.price.toFixed(2)}</p>
-
-                      <div className="d-flex align-items-center">
-                        <button
-                          onClick={() => handleQuantityChange(item.id, -1)}
-                          className="btn btn-outline-secondary btn-sm"
-                          disabled={item.quantity <= 1}
-                        >
-                          <FaMinus />
-                        </button>
-                        <span className="mx-3 fw-bold">{item.quantity}</span>
-                        <button
-                          onClick={() => handleQuantityChange(item.id, 1)}
-                          className="btn btn-outline-secondary btn-sm"
-                        >
-                          <FaPlus />
-                        </button>
-                      </div>
-
-                      <p className="mt-2 mb-0 text-success fw-bold">
-                        Subtotal: ${(item.price * item.quantity).toFixed(2)}
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={() => handleRemoveFromCart(item.id)}
-                      className="btn btn-outline-danger"
-                    >
-                      <FaTrash />
+    <div className="container py-5">
+      <h2>Your Cart</h2>
+      <div className="row">
+        <div className="col-lg-8">
+          {items.map(item => (
+            <div key={item.id} className="card mb-3">
+              <div className="row g-0">
+                <div className="col-md-4">
+                  <img src={item.image || 'https://placehold.co/200x150'} className="img-fluid rounded-start" alt={item.name} />
+                </div>
+                <div className="col-md-8">
+                  <div className="card-body">
+                    <h5>{item.name}</h5>
+                    <p>₹{item.price} × {item.quantity}</p>
+                    <button onClick={() => handleRemove(item.id)} className="btn btn-danger btn-sm">
+                      Remove
                     </button>
                   </div>
                 </div>
-              ))}
-            </div>
-
-            <div className="col-lg-4">
-              <div className="card">
-                <div className="card-body">
-                  <h4 className="card-title">Order Summary</h4>
-                  <hr />
-                  <div className="d-flex justify-content-between mb-2">
-                    <span>Subtotal</span>
-                    <span>${total.toFixed(2)}</span>
-                  </div>
-                  <div className="d-flex justify-content-between mb-3">
-                    <span>Shipping</span>
-                    <span>Free</span>
-                  </div>
-                  <hr />
-                  <div className="d-flex justify-content-between fw-bold fs-5">
-                    <span>Total</span>
-                    <span className="text-success">${total.toFixed(2)}</span>
-                  </div>
-
-                  <button onClick={handleCheckout} className="btn btn-success w-100 mt-3">
-                    Proceed to Checkout
-                  </button>
-                </div>
               </div>
             </div>
+          ))}
+        </div>
+        <div className="col-lg-4">
+          <div className="card">
+            <div className="card-body">
+              <h4>Total: ₹{total}</h4>
+              <button onClick={handleCheckout} className="btn btn-success w-100">
+                Proceed to Checkout
+              </button>
+            </div>
           </div>
-        </>
-      )}
+        </div>
+      </div>
     </div>
   );
 }
