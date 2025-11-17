@@ -3,18 +3,14 @@ import { createSlice } from '@reduxjs/toolkit';
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
-    user: null,
-    token: null
+    user: null
   },
   reducers: {
     setUser: (state, action) => {
       state.user = action.payload;
-      state.token = localStorage.getItem('token');
     },
     logout: (state) => {
       state.user = null;
-      state.token = null;
-      localStorage.removeItem('token');
     }
   }
 });
