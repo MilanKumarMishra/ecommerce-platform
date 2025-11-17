@@ -1,8 +1,18 @@
-// client/src/components/Login.js
 import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import ProductList from './components/ProductList';
+import Cart from './components/Cart';
+import DeliveryForm from './components/DeliveryForm';
+import ThankYou from './components/ThankYou';
+import AdminPanel from './components/AdminPanel';
+import Login from './components/Login';
+import Register from './components/Register';
+import Navbar from './components/Navbar';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
-import { setUser } from '../redux/authSlice';  // Fixed: From authSlice
+import { setUser } from '../redux/authSlice';  // FIXED
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { jwtDecode } from 'jwt-decode';
@@ -22,11 +32,7 @@ function Login() {
       .then(res => {
         localStorage.setItem('token', res.data.token);
         const decoded = jwtDecode(res.data.token);
-        dispatch(setUser({ 
-          id: decoded.id, 
-          email: decoded.email, 
-          isAdmin: decoded.isAdmin 
-        }));
+        dispatch(setUser({ id: decoded.id, email: decoded.email, isAdmin: decoded.isAdmin }));
         toast.success('Welcome back!');
         navigate('/');
       })
