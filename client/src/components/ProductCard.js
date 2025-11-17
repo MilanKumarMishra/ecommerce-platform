@@ -1,36 +1,38 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { addItem } from '../redux/cartSlice';  // Correct import
+import { addToCart } from '../redux/cartSlice';  // CORRECT IMPORT
 import { toast } from 'react-toastify';
 
 function ProductCard({ product }) {
   const dispatch = useDispatch();
 
-  const handleAddToCart = () => {
-    dispatch(addItem({
+  const handleAdd = () => {
+    dispatch(addToCart({
       id: product._id,
       name: product.name,
       price: product.price,
-      image: product.image,
+      image: product.image || 'https://placehold.co/300x200',
       quantity: 1
     }));
-    toast.success('Added to cart!');
+    toast.success(`${product.name} added to cart!`);
   };
 
   return (
-    <div className="card h-100 shadow-sm">
-      <img 
-        src={product.image || 'https://placehold.co/300x200'} 
-        className="card-img-top" 
+    <div className="card h-100 shadow-sm hover-shadow">
+      <img
+        src={product.image || 'https://placehold.co/300x200'}
+        className="card-img-top"
         alt={product.name}
-        style={{ height: '200px', objectFit: 'cover' }}
+        style={{ height: '220px', objectFit: 'cover' }}
       />
       <div className="card-body d-flex flex-column">
         <h5 className="card-title">{product.name}</h5>
-        <p className="card-text text-muted flex-grow-1">{product.description}</p>
-        <div className="d-flex justify-content-between align-items-center mt-auto">
+        <p className="card-text text-muted flex-grow-1">
+          {product.description?.substring(0, 80)}...
+        </p>
+        <div className="mt-auto d-flex justify-content-between align-items-center">
           <span className="h4 text-success mb-0">₹{product.price}</span>
-          <button onClick={handleAddToCart} className="btn btn-primary">
+          <button onClick={handleAdd} className="btn btn-primary btn-lg">
             Add to Cart
           </button>
         </div>

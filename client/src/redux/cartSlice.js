@@ -6,8 +6,8 @@ const cartSlice = createSlice({
     items: []
   },
   reducers: {
-    // This action is used everywhere (ProductCard, Cart load, etc.)
-    addItem: (state, action) => {
+    // UNIVERSAL ACTION — used everywhere
+    addToCart: (state, action) => {
       const existing = state.items.find(i => i.id === action.payload.id);
       if (existing) {
         existing.quantity += action.payload.quantity || 1;
@@ -20,9 +20,7 @@ const cartSlice = createSlice({
     },
     updateQuantity: (state, action) => {
       const item = state.items.find(i => i.id === action.payload.id);
-      if (item) {
-        item.quantity = action.payload.quantity;
-      }
+      if (item) item.quantity = action.payload.quantity;
     },
     clearCart: (state) => {
       state.items = [];
@@ -30,7 +28,6 @@ const cartSlice = createSlice({
   }
 });
 
-// Export the correct action names
-export const { addItem, removeFromCart, updateQuantity, clearCart } = cartSlice.actions;
-
+// EXPORT THESE EXACT NAMES — NEVER CHANGE
+export const { addToCart, removeFromCart, updateQuantity, clearCart } = cartSlice.actions;
 export default cartSlice.reducer;
