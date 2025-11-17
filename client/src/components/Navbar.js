@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { logout } from '../redux/authSlice';
+import { setUser, logout } from '../redux/authSlice';
+import { toast } from 'react-toastify';
 import { jwtDecode } from 'jwt-decode';
 import { FaShoppingCart, FaUser, FaSignOutAlt, FaBoxOpen, FaUserCog } from 'react-icons/fa';
 
@@ -9,7 +10,7 @@ function Navbar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector(state => state.auth.user);
-  const cartItems = useSelector(state => state.cart.items);
+  const cartItems = useSelector(state => state.cart.items || []);
   const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   useEffect(() => {
@@ -20,13 +21,13 @@ function Navbar() {
         dispatch(setUser({ id: decoded.id, email: decoded.email, isAdmin: decoded.isAdmin }));
       } catch (err) {
         localStorage.removeItem('token');
-        dispatch(logout());
       }
     }
   }, [dispatch]);
 
   const handleLogout = () => {
     dispatch(logout());
+    localStorage.removeItem('token');
     toast.success('Logged out successfully!');
     navigate('/');
   };
@@ -39,7 +40,7 @@ function Navbar() {
           <span className="navbar-toggler-icon"></span>
         </button>
         <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav ms-auto">
+          <ul className="navbar-nav ms-auto align-items-center">
             <li className="nav-item"><Link className="nav-link" to="/">Products</Link></li>
             <li className="nav-item position-relative">
               <Link className="nav-link" to="/cart">
@@ -52,13 +53,13 @@ function Navbar() {
             {user ? (
               <li className="nav-item">
                 <button className="nav-link btn btn-link text-danger" onClick={handleLogout}>
-                  <FaSignOutAlt /> Logout ({user.email})
+                  <FaSignOutAlt /> Logout
                 </button>
               </li>
             ) : (
               <>
                 <li className="nav-item"><Link className="nav-link" to="/login"><FaUser /> Login</Link></li>
-                <li className="nav-item"><Link className="btn btn-primary text-white ms-2" to="/register">Register</Link></li>
+                <li className="nav-item"><Link className="btn btn-primary text-white ms-2 px-4" to="/register">Register</Link></li>
               </>
             )}
           </ul>
