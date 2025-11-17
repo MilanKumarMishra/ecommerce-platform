@@ -6,8 +6,8 @@ const cartSlice = createSlice({
     items: []
   },
   reducers: {
-    // This is the action used when adding items
-    addToCart: (state, action) => {
+    // This action is used everywhere (ProductCard, Cart load, etc.)
+    addItem: (state, action) => {
       const existing = state.items.find(i => i.id === action.payload.id);
       if (existing) {
         existing.quantity += action.payload.quantity || 1;
@@ -18,7 +18,7 @@ const cartSlice = createSlice({
     removeFromCart: (state, action) => {
       state.items = state.items.filter(i => i.id !== action.payload);
     },
-    updateCartItemQuantity: (state, action) => {
+    updateQuantity: (state, action) => {
       const item = state.items.find(i => i.id === action.payload.id);
       if (item) {
         item.quantity = action.payload.quantity;
@@ -30,7 +30,7 @@ const cartSlice = createSlice({
   }
 });
 
-// Export all actions
-export const { addToCart, removeFromCart, updateCartItemQuantity, clearCart } = cartSlice.actions;
+// Export the correct action names
+export const { addItem, removeFromCart, updateQuantity, clearCart } = cartSlice.actions;
 
 export default cartSlice.reducer;
